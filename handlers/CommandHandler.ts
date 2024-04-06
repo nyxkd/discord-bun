@@ -1,7 +1,6 @@
 import { Collection, Routes } from 'discord.js';
-import type { ApplicationCommand } from 'discord.js';
+import type { ApplicationCommand, ChatInputCommandInteraction } from 'discord.js';
 
-import type { Command } from '../types';
 import CustomClient from '../structures/CustomClient';
 
 import { join } from "node:path";
@@ -33,12 +32,23 @@ class CommandHandler {
 
         this.client.logger.log('silly', `Found ${commandFiles.length} commands. Commands: ${commandFiles.map(file => file.split('.')[0]).join(', ')}`);
 
+        const doesHashesExist = await Bun.file('hashes.json').exists();
+
+        if (!doesHashesExist) {
+            this.client.logger.log('warn', 'Hashes file does not exist. Creating one now...');
+
+            Bun.write('hashes.json', '{}')
+                .then(() => {
+                    this.client.logger.log('silly', 'Created hashes file.');
+                });
+        }
+
         await Bun.file('hashes.json').json()
             .then(async (hashes) => {
                 this.client.logger.log('silly', `Hashes: ${JSON.stringify(hashes)}`);
 
                 for (const file of commandFiles) {
-                    const command: Command = (await import(join(commandsPath, file))).default;
+                    const command: Command<ChatInputCommandInteraction> = (await import(join(commandsPath, file))).default;
                     const commandData = command.data;
 
                     const savedHash = hashes[commandData.name];
@@ -83,14 +93,18 @@ class CommandHandler {
                         this.client.logger.log('warn', `Command ${commandData.name} has no hash!`);
 
                         hashes[commandData.name] = hasher.update(JSON.stringify(commandData)).digest('hex');
+
+                        Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
+                            .then(() => {
+                                this.client.logger.log('silly', `Wrote hash for ${commandData.name} to file.`);
+                            });
                     }
 
                     this.client.commands.set(command.data.name, command);
                     this.client.logger.log('commandHandler', `Loaded command: ${commandData.name}. Hash: ${hashes[commandData.name]}`);
                 };
-
-                // await this.registerTestGuildCommands();
             });
+            
     }
 }
 
