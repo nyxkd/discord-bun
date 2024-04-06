@@ -34,24 +34,9 @@ class EventHandler {
             this.client.logger.log('eventHandler', `Loaded event: ${eventName}`);
         }
 
-        /* for (const file of eventFiles) {
-            const event: Event = (await import(join(eventsPath, file))).default;
-            const eventName = file.split('.')[0];
-
-            if (event.once) {
-                this.client.once(Event<T>, (...args) => event.execute(this.client, ...args));
-            } else {
-                this.client.on(eventName, (...args) => event.execute(this.client, ...args));
-            }
-
-            this.client.events.set(eventName, event);
-            this.client.logger.log('eventHandler', `Loaded event: ${eventName}`);
-
-        } */
-
         const t1 = Date.now();
 
-        this.client.logger.log('silly', `Loaded ${eventFiles.length} events in ${t1 - t0}ms.`);
+        this.client.logger.log('eventHandler', `Loaded ${eventFiles.length} events in ${t1 - t0}ms.`);
     }
 }
 
