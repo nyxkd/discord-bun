@@ -1,22 +1,14 @@
-import type { Event } from "../types";
-import { EmbedBuilder, Colors } from "discord.js";
+import { BaseInteraction } from 'discord.js';
+import { EmbedBuilder, Colors, Events } from "discord.js";
 
-const event: Event = {
+import type { Event } from '../globals';
+
+const interactionCreateEvent: Event<Events.InteractionCreate> = {
     once: false,
-    async execute(client, interaction) {
+    async execute(client, interaction: BaseInteraction) {
+        if (!interaction.isCommand()) return;
+
         const command = client.commands.get(interaction.commandName);
-
-        if (!client.commands.has(interaction.commandName)) {
-            const embed = new EmbedBuilder()
-                .setTitle('This command exists in the files but has been not registered!')
-                .setColor(Colors.Red);
-
-            await interaction.reply({
-                embeds: [embed],
-                ephemeral: true
-            });
-        };
-
 
         if (!command) return;
 
@@ -35,6 +27,6 @@ const event: Event = {
             });
         }
     }
-};
+}
 
-export default event;
+export default interactionCreateEvent;

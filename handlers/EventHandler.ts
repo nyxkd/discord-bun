@@ -2,7 +2,6 @@ import { join } from "node:path";
 import { readdir } from "node:fs/promises";
 
 import type CustomClient from "../structures/CustomClient";
-import type { Event } from "../types";
 
 class EventHandler {
     client: CustomClient;
@@ -21,14 +20,26 @@ class EventHandler {
             return;
         };
 
-
         for (const file of eventFiles) {
+            const event = await import(join(eventsPath, file));
+            const eventName = file.split('.')[0];
+
+            if (event.default.once) {
+                this.client.once(eventName, (...args) => event.default.execute(this.client, ...args));
+            } else {
+                this.client.on(eventName, (...args) => event.default.execute(this.client, ...args));
+            }
+
+            this.client.events.set(eventName, event.default);
+            this.client.logger.log('eventHandler', `Loaded event: ${eventName}`);
+        }
+
+        /* for (const file of eventFiles) {
             const event: Event = (await import(join(eventsPath, file))).default;
             const eventName = file.split('.')[0];
 
-
             if (event.once) {
-                this.client.once(eventName, (...args) => event.execute(this.client, ...args));
+                this.client.once(Event<T>, (...args) => event.execute(this.client, ...args));
             } else {
                 this.client.on(eventName, (...args) => event.execute(this.client, ...args));
             }
@@ -36,7 +47,7 @@ class EventHandler {
             this.client.events.set(eventName, event);
             this.client.logger.log('eventHandler', `Loaded event: ${eventName}`);
 
-        }
+        } */
 
         const t1 = Date.now();
 

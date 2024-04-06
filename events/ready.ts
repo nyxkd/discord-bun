@@ -1,10 +1,12 @@
-import type { Event } from "../types";
+import { Events } from 'discord.js';
 
-const event: Event = {
+import type { Event } from '../globals';
+
+const readyEvent: Event<Events.ClientReady> = {
     once: true,
-    async execute(client) {
-        client.logger.log('event', 'Ready!')
+    execute: async (client) => {
+        client.logger.log('silly', `Logged in as ${client.user?.tag}!`);
     }
 }
 
-export default event;
+export default readyEvent;

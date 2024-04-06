@@ -1,10 +1,12 @@
 import { SlashCommandBuilder, EmbedBuilder, Colors } from "discord.js";
 
-export default {
+import type { ChatInputCommandInteraction } from "discord.js";
+
+const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()
         .setName('test')
-        .setDescription('Test command!'),
-    async execute(interaction) {
+        .setDescription('Test command'),
+    execute: async (interaction) => {
         const embed = new EmbedBuilder()
             .setTitle('Test')
             .setColor(Colors.Green);
@@ -15,3 +17,5 @@ export default {
         });
     }
 };
+
+export default command;

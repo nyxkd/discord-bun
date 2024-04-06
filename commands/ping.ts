@@ -1,10 +1,18 @@
-import { SlashCommandBuilder, EmbedBuilder, Colors } from "discord.js";
+import {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    Colors
+} from "discord.js";
 
-export default {
+import type {
+    ChatInputCommandInteraction,
+} from "discord.js";
+
+const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Pong! Returns the latency of the bot in ms!'),
-    async execute(interaction) {
+    execute: async (interaction) => {
         const wslatency = Date.now() - interaction.createdTimestamp;
         const apilatency = Math.round(interaction.client.ws.ping);
 
@@ -30,3 +38,5 @@ export default {
         });
     }
 };
+
+export default command;

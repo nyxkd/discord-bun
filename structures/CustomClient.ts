@@ -1,5 +1,4 @@
-import { Client, GatewayIntentBits, ActivityType, Collection } from 'discord.js';
-import type { Config, Command, Event } from '../types';
+import { Client, GatewayIntentBits, ActivityType, Collection, type Interaction } from 'discord.js';
 
 import { REST } from '@discordjs/rest';
 
@@ -12,16 +11,14 @@ class CustomClient extends Client {
     readonly config: Config;
     applicationID: string = this.application?.id as string || '1224339063318773780';
 
-    commands: Collection<string, Command> = new Collection();
-    events: Collection<string, Event> = new Collection();
+    commands: Collection<string, Command<Interaction>> = new Collection();
+    events: Collection<string, Event<any>> = new Collection();
 
     logger = Logger;
 
-    declare rest: REST;
 
     EventHandler: EventHandler;
     CommandHandler: CommandHandler;
-
 
     constructor(config: Config) {
         super({
