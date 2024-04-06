@@ -28,7 +28,7 @@ class CommandHandler {
             });
 
             // this.client.logger.log('silly', `Already registered commands: ${commands.map(command => command.name).join(', ')}`);
-        
+
             for (const command of alreadyRegisteredCommands.values()) {
                 if (!commandFiles.includes(`${command.name}.ts`) && !commandFiles.includes(`${command.name}.js`)) {
                     this.client.logger.log('warn', `Command ${command.name} is registered but not found in commands folder. Deleting it...`);
@@ -37,28 +37,28 @@ class CommandHandler {
                         Routes.applicationCommand(this.client.applicationID, command.id)
                     )
                         .then(() => {
-                            this.client.logger.log('silly', `Deleted command ${command.name}.`);
+                            this.client.logger.log('commandHandler', `Deleted command ${command.name}.`);
                         })
                         .catch((error) => {
                             this.client.logger.log('error', `Error deleting command ${command.name}: ${error}`);
                         });
-                    
+
                     Bun.file('hashes.json').json()
                         .then(async (hashes) => {
                             delete hashes[command.name];
 
                             Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
                                 .then(() => {
-                                    this.client.logger.log('silly', `Deleted hash for ${command.name}.`);
+                                    this.client.logger.log('commandHandler', `Deleted hash for ${command.name}.`);
                                 });
                         });
-                    
-                    
+
+
                 }
             }
         })
 
-        this.client.logger.log('silly', `Found ${commandFiles.length} commands. Commands: ${commandFiles.map(file => file.split('.')[0]).join(', ')}`);
+        this.client.logger.log('commandHandler', `Found ${commandFiles.length} commands. Commands: ${commandFiles.map(file => file.split('.')[0]).join(', ')}`);
 
         const doesHashesExist = await Bun.file('hashes.json').exists();
 
@@ -67,13 +67,13 @@ class CommandHandler {
 
             Bun.write('hashes.json', '{}')
                 .then(() => {
-                    this.client.logger.log('silly', 'Created hashes file.');
+                    this.client.logger.log('commandHandler', 'Created hashes file.');
                 });
         }
 
         await Bun.file('hashes.json').json()
             .then(async (hashes) => {
-                this.client.logger.log('silly', `Hashes: ${JSON.stringify(hashes)}`);
+                this.client.logger.log('commandHandler', `Hashes: ${JSON.stringify(hashes)}`);
 
                 for (const file of commandFiles) {
                     const command: Command<ChatInputCommandInteraction> = (await import(join(commandsPath, file))).default;
@@ -83,7 +83,7 @@ class CommandHandler {
                     const currentHash = hasher.update(JSON.stringify(commandData)).digest('hex');
 
                     if (savedHash && savedHash !== currentHash) {
-                        this.client.logger.log('silly', `Command ${commandData.name} has changed. Old hash: ${savedHash}, new hash: ${currentHash}`);
+                        this.client.logger.log('commandHandler', `Command ${commandData.name} has changed. Old hash: ${savedHash}, new hash: ${currentHash}`);
 
                         hashes[commandData.name] = currentHash;
 
@@ -92,7 +92,7 @@ class CommandHandler {
                         ).then((commands: ApplicationCommand[]) => {
                             const commandToSelect = commands.find(c => c.name === commandData.name);
 
-                            this.client.logger.log('silly', `Command to select: ${JSON.stringify(commandToSelect)}`);
+                            this.client.logger.log('commandHandler', `Command to select: ${JSON.stringify(commandToSelect)}`);
 
                             this.client.rest.patch(
                                 Routes.applicationGuildCommand(this.client.applicationID, this.client.config.testGuildID, commandToSelect.id),
@@ -104,7 +104,7 @@ class CommandHandler {
                                 }
                             )
                                 .then(() => {
-                                    this.client.logger.log('silly', `Updated command ${commandData.name} in test guild.`);
+                                    this.client.logger.log('commandHandler', `Updated command ${commandData.name} in test guild.`);
                                 })
                                 .catch((error) => {
                                     this.client.logger.log('error', `Error updating command ${commandData.name} in test guild: ${error}`);
@@ -113,7 +113,7 @@ class CommandHandler {
 
                         Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
                             .then(() => {
-                                this.client.logger.log('silly', `Wrote hashes to file.`);
+                                this.client.logger.log('commandHandler', `Wrote hashes to file.`);
                             });
                     }
 
@@ -124,7 +124,7 @@ class CommandHandler {
 
                         Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
                             .then(() => {
-                                this.client.logger.log('silly', `Wrote hash for ${commandData.name} to file.`);
+                                this.client.logger.log('commandHandler', `Wrote hash for ${commandData.name} to file.`);
                             });
                     }
 
@@ -132,7 +132,7 @@ class CommandHandler {
                     this.client.logger.log('commandHandler', `Loaded command: ${commandData.name}. Hash: ${hashes[commandData.name]}`);
                 };
             });
-            
+
     }
 }
 
