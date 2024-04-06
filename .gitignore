@@ -4,6 +4,9 @@
 
 config.json
 
+# Misc
+hashes.json
+
 # Logs
 
 logs
