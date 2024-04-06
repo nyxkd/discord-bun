@@ -9,7 +9,7 @@ import Logger from './Logger';
 
 class CustomClient extends Client {
     readonly config: Config;
-    applicationID: string = this.application?.id as string || '1224339063318773780';
+    applicationID: string;
 
     commands: Collection<string, Command<Interaction>> = new Collection();
     events: Collection<string, Event<any>> = new Collection();
@@ -37,21 +37,21 @@ class CustomClient extends Client {
         });
 
         this.config = config;
+        this.applicationID = config.applicationID;
         this.EventHandler = new EventHandler(this);
         this.CommandHandler = new CommandHandler(this);
-
         this.rest = new REST().setToken(this.config.token);
-
+        
         this.rest.on('response', (response) => {
             this.logger.log("rest", `REST Client has received a response: ${response.method} ${response.path}`);
         });
-
+        
         this.rest.on('rateLimited', (rateLimitInfo) => {
             this.logger.log("warn", `REST Client has been rate limited! Timeout: ${rateLimitInfo.retryAfter}ms, Limit: ${rateLimitInfo.limit}, Method: ${rateLimitInfo.method}, Route: ${rateLimitInfo.route}`)
         });
-
+        
         this.config.isDevelopmentENV ? this.logger.log('warn', 'Development environment detected.') : this.logger.log('warn', 'Production environment detected.');
-
+        
         this.initialize();
     }
 

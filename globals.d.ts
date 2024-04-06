@@ -1,5 +1,6 @@
 import type {
     Client,
+    ClientApplication,
     User,
     Guild,
     BaseInteraction,
@@ -15,6 +16,7 @@ export interface Event<T extends keyof ClientEvents> {
 declare global {
     interface Config {
         token: Client["token"];
+        applicationID: ClientApplication["id"];
         devIDs: User["id"][];
         testGuildID: Guild["id"];
         isDevelopmentENV: boolean;
@@ -27,6 +29,7 @@ declare global {
     interface CustomClient extends Client {
         config: Config;
         logger: Logger;
+        applicationID: string;
 
         commands: Collection<string, Command<BaseInteraction>>;
         events: Collection<string, Event<any>>;
