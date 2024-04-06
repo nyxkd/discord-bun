@@ -2,7 +2,8 @@
   "name": "discord-bun",
   "module": "index.ts",
   "dependencies": {
-    "discord.js": "^14.14.1"
+    "discord.js": "^14.14.1",
+    "winston": "^3.13.0"
   },
   "scripts": {
     "start": "bun run .",
