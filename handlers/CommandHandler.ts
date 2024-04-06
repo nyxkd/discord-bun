@@ -27,7 +27,35 @@ class CommandHandler {
                 alreadyRegisteredCommands.set(command.name, command);
             });
 
-            this.client.logger.log('silly', `Already registered commands: ${commands.map(command => command.name).join(', ')}`);
+            // this.client.logger.log('silly', `Already registered commands: ${commands.map(command => command.name).join(', ')}`);
+        
+            for (const command of alreadyRegisteredCommands.values()) {
+                if (!commandFiles.includes(`${command.name}.ts`) && !commandFiles.includes(`${command.name}.js`)) {
+                    this.client.logger.log('warn', `Command ${command.name} is registered but not found in commands folder. Deleting it...`);
+
+                    this.client.rest.delete(
+                        Routes.applicationCommand(this.client.applicationID, command.id)
+                    )
+                        .then(() => {
+                            this.client.logger.log('silly', `Deleted command ${command.name}.`);
+                        })
+                        .catch((error) => {
+                            this.client.logger.log('error', `Error deleting command ${command.name}: ${error}`);
+                        });
+                    
+                    Bun.file('hashes.json').json()
+                        .then(async (hashes) => {
+                            delete hashes[command.name];
+
+                            Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
+                                .then(() => {
+                                    this.client.logger.log('silly', `Deleted hash for ${command.name}.`);
+                                });
+                        });
+                    
+                    
+                }
+            }
         })
 
         this.client.logger.log('silly', `Found ${commandFiles.length} commands. Commands: ${commandFiles.map(file => file.split('.')[0]).join(', ')}`);
