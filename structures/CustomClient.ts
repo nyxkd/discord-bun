@@ -50,8 +50,6 @@ class CustomClient extends Client {
             this.logger.log("warn", `REST Client has been rate limited! Timeout: ${rateLimitInfo.retryAfter}ms, Limit: ${rateLimitInfo.limit}, Method: ${rateLimitInfo.method}, Route: ${rateLimitInfo.route}`)
         });
         
-        this.config.isDevelopmentENV ? this.logger.log('warn', 'Development environment detected.') : this.logger.log('warn', 'Production environment detected.');
-        
         this.initialize();
     }
 

@@ -19,7 +19,6 @@ declare global {
         applicationID: ClientApplication["id"];
         devIDs: User["id"][];
         testGuildID: Guild["id"];
-        isDevelopmentENV: boolean;
     }
 
     interface Logger {

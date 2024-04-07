@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "bun run .",
-    "dev": "NODE_ENV=development bun run --watch .",
+    "dev": "bun run --watch .",
     "build": "bun build . --target=bun --outdir=dist --outfile=index.js",
     "build:prod": "bun build --compile --minify --sourcemap . --outfile ./dist/run"
   },
