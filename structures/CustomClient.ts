@@ -1,6 +1,8 @@
-import { Client, GatewayIntentBits, ActivityType, Collection, type Interaction } from 'discord.js';
+import { Client, GatewayIntentBits, ActivityType, Collection, type Interaction, type ClientEvents} from 'discord.js';
 
 import { REST } from '@discordjs/rest';
+
+import type { Event } from '../globals';
 
 import EventHandler from '../handlers/EventHandler';
 import CommandHandler from '../handlers/CommandHandler';
@@ -12,7 +14,7 @@ class CustomClient extends Client {
     applicationID: string;
 
     commands: Collection<string, Command<Interaction>> = new Collection();
-    events: Collection<string, Event<any>> = new Collection();
+    events: Collection<string, Event<keyof ClientEvents>> = new Collection();
 
     logger = Logger;
 
