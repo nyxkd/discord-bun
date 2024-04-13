@@ -15,11 +15,6 @@ class EventHandler {
         const eventFiles = (await readdir(eventsPath)).filter(file => file.endsWith('.ts') || file.endsWith('.js'));
         const t0 = Date.now();
 
-        if (eventFiles.length === 0) {
-            this.client.logger.log('eventHandler', 'No events found.');
-            return;
-        };
-
         for (const file of eventFiles) {
             const event = await import(join(eventsPath, file));
             const eventName = file.split('.')[0];
@@ -34,9 +29,7 @@ class EventHandler {
             this.client.logger.log('eventHandler', `Loaded event: ${eventName}`);
         }
 
-        const t1 = Date.now();
-
-        this.client.logger.log('eventHandler', `Loaded ${eventFiles.length} events in ${t1 - t0}ms.`);
+        this.client.logger.log('eventHandler', `Loaded ${eventFiles.length} events. (${Date.now() - t0}ms)`);
     }
 }
 

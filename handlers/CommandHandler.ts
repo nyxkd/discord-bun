@@ -1,5 +1,6 @@
-import { Collection, Routes } from 'discord.js';
-import type { ApplicationCommand, ChatInputCommandInteraction } from 'discord.js';
+import { Collection } from 'discord.js';
+import { ApplicationCommandsAPI } from '@discordjs/core'
+import type { APIApplicationCommand, ChatInputCommandInteraction } from 'discord.js';
 
 import CustomClient from '../structures/CustomClient';
 
@@ -8,131 +9,131 @@ import { readdir } from "node:fs/promises";
 
 class CommandHandler {
     client: CustomClient;
+    APIClient: ApplicationCommandsAPI;
 
     constructor(client: CustomClient) {
         this.client = client;
     }
 
+    async readHash(command: string) {
+        // const hash = await Bun.file('hashes.json').json()[command] : throw new Error(`Hash for command ${command} does not exist!`) ? 
+        const hashes = await Bun.file('hashes.json').json();
+
+        if (!hashes[command]) {
+            throw new Error(`Hash for command ${command} does not exist!`);
+        }
+
+        return hashes[command];
+    }
+
+    async createHash(command: string, hash: string) {
+        const hashes = await Bun.file('hashes.json').json();
+        hashes[command] = hash;
+
+        await Bun.write('hashes.json', JSON.stringify(hashes, null, 4));
+    }
+
+    async deleteHash(command: string) {
+        const hashes = await Bun.file('hashes.json').json();
+        delete hashes[command];
+
+        await Bun.write('hashes.json', JSON.stringify(hashes, null, 4));
+    }
+
+
     async initialize() {
-        const alreadyRegisteredCommands = new Collection<string, ApplicationCommand>();
-        const commandsPath = join(__dirname, '..', 'commands');
+        const commandsPath = join(process.cwd(), 'commands');
         const commandFiles = (await readdir(commandsPath)).filter(file => file.endsWith('.ts') || file.endsWith('.js'));
 
         const hasher = new Bun.CryptoHasher('md5');
 
-        this.client.rest.get(
-            Routes.applicationCommands(this.client.applicationID)
-        ).then((commands: ApplicationCommand[]) => {
-            commands.forEach(command => {
-                alreadyRegisteredCommands.set(command.name, command);
-            });
-
-            // this.client.logger.log('silly', `Already registered commands: ${commands.map(command => command.name).join(', ')}`);
-
-            for (const command of alreadyRegisteredCommands.values()) {
-                if (!commandFiles.includes(`${command.name}.ts`) && !commandFiles.includes(`${command.name}.js`)) {
-                    this.client.logger.log('warn', `Command ${command.name} is registered but not found in commands folder. Deleting it...`);
-
-                    this.client.rest.delete(
-                        Routes.applicationCommand(this.client.applicationID, command.id)
-                    )
-                        .then(() => {
-                            this.client.logger.log('commandHandler', `Deleted command ${command.name}.`);
-                        })
-                        .catch((error) => {
-                            this.client.logger.log('error', `Error deleting command ${command.name}: ${error}`);
-                        });
-
-                    Bun.file('hashes.json').json()
-                        .then(async (hashes) => {
-                            delete hashes[command.name];
-
-                            Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
-                                .then(() => {
-                                    this.client.logger.log('commandHandler', `Deleted hash for ${command.name}.`);
-                                });
-                        });
-
-
-                }
-            }
-        })
-
-        this.client.logger.log('commandHandler', `Found ${commandFiles.length} commands. Commands: ${commandFiles.map(file => file.split('.')[0]).join(', ')}`);
-
-        const doesHashesExist = await Bun.file('hashes.json').exists();
-
-        if (!doesHashesExist) {
-            this.client.logger.log('warn', 'Hashes file does not exist. Creating one now...');
-
-            Bun.write('hashes.json', '{}')
-                .then(() => {
-                    this.client.logger.log('commandHandler', 'Created hashes file.');
-                });
+        const doesHasesExist = await Bun.file('hashes.json').exists();
+        if (!doesHasesExist) {
+            this.client.logger.log('commandHandler', 'Hashes file does not exist, creating one...');
+            await Bun.write('hashes.json', '{}');
         }
 
-        await Bun.file('hashes.json').json()
-            .then(async (hashes) => {
-                this.client.logger.log('commandHandler', `Hashes: ${JSON.stringify(hashes)}`);
+        const localCommands = new Collection<string, Command<ChatInputCommandInteraction>>();
 
-                for (const file of commandFiles) {
-                    const command: Command<ChatInputCommandInteraction> = (await import(join(commandsPath, file))).default;
-                    const commandData = command.data;
+        // Populate localCommands with the local commands
+        for (const file of commandFiles) {
+            const command = (await import(join(commandsPath, file))).default;
+            localCommands.set(command.data.name, command);
+        }
+        // console.table(localCommands.map(command => command.data.name));
 
-                    const savedHash = hashes[commandData.name];
-                    const currentHash = hasher.update(JSON.stringify(commandData)).digest('hex');
+        // this.client.logger.log('commandHandler', `Found ${commandFiles.length} command files: ${commandFiles.join(', ')}`);
+        // this.client.logger.log('commandHandler', `Loaded ${localCommands.size} commands: ${localCommands.map(command => command.data.name).join(', ')}`);
 
-                    if (savedHash && savedHash !== currentHash) {
-                        this.client.logger.log('commandHandler', `Command ${commandData.name} has changed. Old hash: ${savedHash}, new hash: ${currentHash}`);
+        this.APIClient = new ApplicationCommandsAPI(this.client.rest);
 
-                        hashes[commandData.name] = currentHash;
+        const guildCommands = new Collection<string, APIApplicationCommand>();
 
-                        this.client.rest.get(
-                            Routes.applicationGuildCommands(this.client.applicationID, this.client.config.testGuildID)
-                        ).then((commands: ApplicationCommand[]) => {
-                            const commandToSelect = commands.find(c => c.name === commandData.name);
+        // Populate guildCommands with the guild commands
+        await this.APIClient.getGuildCommands(this.client.config.applicationID, this.client.config.testGuildID).then(async (commands) => {
+            for (const command of commands) {
+                guildCommands.set(command.name, command);
+            }
 
-                            this.client.logger.log('commandHandler', `Command to select: ${JSON.stringify(commandToSelect)}`);
+            // this.client.logger.log('commandHandler', `Found ${commands.length} guild commands: ${commands.map(command => command.name).join(', ')}`);
+        });
+        // console.table(guildCommands.map(command => command.name));
 
-                            this.client.rest.patch(
-                                Routes.applicationGuildCommand(this.client.applicationID, this.client.config.testGuildID, commandToSelect.id),
-                                {
-                                    body: commandData,
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                }
-                            )
-                                .then(() => {
-                                    this.client.logger.log('commandHandler', `Updated command ${commandData.name} in test guild.`);
-                                })
-                                .catch((error) => {
-                                    this.client.logger.log('error', `Error updating command ${commandData.name} in test guild: ${error}`);
-                                });
-                        });
+        // Check if there are any commands that are on the guild but not local and delete them
+        guildCommands.forEach(async (command) => {
+            if (!localCommands.has(command.name)) {
+                this.APIClient.deleteGuildCommand(this.client.config.applicationID, this.client.config.testGuildID, command.id);
 
-                        Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
-                            .then(() => {
-                                this.client.logger.log('commandHandler', `Wrote hashes to file.`);
-                            });
+                // delete the hash from the hashes file
+                const hash = await this.readHash(command.name);
+                this.client.logger.log('commandHandler', `Deleted hash for command ${command.name}: ${hash}`);
+
+                this.client.logger.log('commandHandler', `Deleted guild command: ${command.name}`);
+            }
+        });
+
+        // Check if there are any commands that are local but not on the guild and create them
+        localCommands.forEach(async (command) => {
+            if (!guildCommands.has(command.data.name)) {
+                this.APIClient.createGuildCommand(this.client.config.applicationID, this.client.config.testGuildID, command.data.toJSON());
+                this.client.logger.log('commandHandler', `Registered guild command: ${command.data.name}`);
+            }
+        });
+
+        this.client.commands = localCommands;
+
+        for (const command of this.client.commands.values()) {
+            const hashes = await Bun.file('hashes.json').json();
+
+            const hash = await hasher.update(JSON.stringify(command.data.toJSON())).digest('hex');
+            const existingHash = hashes[command.data.name];
+
+            if (hash !== existingHash) {
+                this.client.logger.log('commandHandler', `Hash for command ${command.data.name} does not match, updating...`);
+
+                await this.APIClient.getGuildCommands(this.client.config.applicationID, this.client.config.testGuildID).then(async (commands) => {
+                    for (const guildCommand of commands) {
+                        if (guildCommand.name === command.data.name) {
+                            await this.APIClient.editGuildCommand(this.client.config.applicationID, this.client.config.testGuildID, guildCommand.id, command.data.toJSON());
+                        }
                     }
+                });
 
-                    if (!hashes[commandData.name]) {
-                        this.client.logger.log('warn', `Command ${commandData.name} has no hash!`);
+                this.createHash(command.data.name, hash);
+            }
 
-                        hashes[commandData.name] = hasher.update(JSON.stringify(commandData)).digest('hex');
+            // check if hashes contain the hashes for a command which is not in the local commands and delete it
+            for (const commandName in hashes) {
+                if (!this.client.commands.has(commandName)) {
+                    this.deleteHash(commandName);
+                    this.client.logger.log('commandHandler', `Deleted hash for command ${commandName}`);
+                }
+            }
+            
 
-                        Bun.write('hashes.json', JSON.stringify(hashes, null, 4))
-                            .then(() => {
-                                this.client.logger.log('commandHandler', `Wrote hash for ${commandData.name} to file.`);
-                            });
-                    }
-
-                    this.client.commands.set(command.data.name, command);
-                    this.client.logger.log('commandHandler', `Loaded command: ${commandData.name}. Hash: ${hashes[commandData.name]}`);
-                };
-            });
-
+            this.client.logger.log('commandHandler', `Hash for command ${command.data.name}: ${hash}`);
+            this.client.commands.set(command.data.name, command);
+        }
     }
 }
 
