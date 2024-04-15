@@ -1,20 +1,22 @@
 {
-  "name": "discord-bun",
-  "module": "index.ts",
-  "dependencies": {
-    "@discordjs/core": "^1.1.1",
-    "discord.js": "^14.14.1",
-    "winston": "^3.13.0"
-  },
-  "scripts": {
-    "start": "bun run .",
-    "dev": "bun run --watch .",
-    "build": "bun build . --target=bun --outdir=dist --outfile=index.js",
-    "build:prod": "bun build --compile --minify --sourcemap . --outfile ./dist/run"
-  },
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "^1.0.12",
-    "typescript": "^5.4.4"
-  }
+    "name": "discord-bun",
+    "module": "index.ts",
+    "dependencies": {
+        "@discordjs/core": "^1.1.1",
+        "discord.js": "^14.14.1",
+        "winston": "^3.13.0"
+    },
+    "scripts": {
+        "start": "bun run .",
+        "dev": "bun run --watch .",
+        "format": "prettier --write .",
+        "build": "bun build . --target=bun --outdir=dist --outfile=index.js",
+        "build:prod": "bun build --compile --minify --sourcemap . --outfile ./dist/run"
+    },
+    "type": "module",
+    "devDependencies": {
+        "@types/bun": "^1.0.12",
+        "prettier": "^3.2.5",
+        "typescript": "^5.4.4"
+    }
 }

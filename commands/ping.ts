@@ -1,6 +1,6 @@
-import { SlashCommandBuilder, EmbedBuilder, Colors } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, Colors } from 'discord.js';
 
-import type { ChatInputCommandInteraction } from "discord.js";
+import type { ChatInputCommandInteraction } from 'discord.js';
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()
@@ -23,7 +23,6 @@ const command: Command<ChatInputCommandInteraction> = {
                     value: `**${apilatency}**ms`,
                     inline: true
                 }
-
             ])
             .setColor(Colors.Green);
 
