@@ -7,6 +7,6 @@ const readyEvent: Event<Events.ClientReady> = {
     execute: async (client) => {
         client.logger.log('event', `Logged in as ${client.user?.tag}!`);
     }
-}
+};
 
 export default readyEvent;

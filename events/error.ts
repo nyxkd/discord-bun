@@ -7,6 +7,6 @@ const errorEvent: Event<Events.Error> = {
     async execute(client, error) {
         client.logger.log('error', `An error has occured: ${error}`);
     }
-}
+};
 
 export default errorEvent;

@@ -6,7 +6,7 @@ import type {
     BaseInteraction,
     SlashCommandBuilder,
     ClientEvents
-} from "discord.js";
+} from 'discord.js';
 
 export interface Event<T extends keyof ClientEvents> {
     once?: boolean;
@@ -15,10 +15,10 @@ export interface Event<T extends keyof ClientEvents> {
 
 declare global {
     interface Config {
-        token: Client["token"];
-        applicationID: ClientApplication["id"];
-        devIDs: User["id"][];
-        testGuildID: Guild["id"];
+        token: Client['token'];
+        applicationID: ClientApplication['id'];
+        devIDs: User['id'][];
+        testGuildID: Guild['id'];
     }
 
     interface Logger {
@@ -44,6 +44,9 @@ declare global {
 
     interface Event<T extends keyof ClientEvents> {
         once?: boolean;
-        execute: (client: CustomClient, ...args: ClientEvents[T]) => Promise<void>;
+        execute: (
+            client: CustomClient,
+            ...args: ClientEvents[T]
+        ) => Promise<void>;
     }
 }

@@ -1,5 +1,5 @@
 import { BaseInteraction } from 'discord.js';
-import { EmbedBuilder, Colors, Events } from "discord.js";
+import { EmbedBuilder, Colors, Events } from 'discord.js';
 
 import type { Event } from '../globals';
 
@@ -15,7 +15,10 @@ const interactionCreateEvent: Event<Events.InteractionCreate> = {
         try {
             await command.execute(interaction);
         } catch (error: any) {
-            client.logger.log('error', `An error has occured while executing ${interaction}: ${error}`);
+            client.logger.log(
+                'error',
+                `An error has occured while executing ${interaction}: ${error}`
+            );
 
             const embed = new EmbedBuilder()
                 .setTitle('There was an error while executing this command!')
@@ -27,6 +30,6 @@ const interactionCreateEvent: Event<Events.InteractionCreate> = {
             });
         }
     }
-}
+};
 
 export default interactionCreateEvent;
