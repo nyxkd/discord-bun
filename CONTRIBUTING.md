@@ -23,6 +23,7 @@
 ## Making changes
 * Create a new branch for your changes (`git checkout -b my-new-feature`)
 * Make your changes 
+* Use `bun format` to format your code using [Prettier](https://prettier.io/)
 * Commit your changes (`git commit -am 'Add some feature'`)
 * Push your changes to your fork (`git push origin my-new-feature`)
 * Create a pull request against the `main` branch
