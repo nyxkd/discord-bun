@@ -1,4 +1,10 @@
-import { SlashCommandBuilder, EmbedBuilder, Colors } from 'discord.js';
+import {
+    Colors,
+    EmbedBuilder,
+    SlashCommandBuilder,
+    bold,
+    italic
+} from 'discord.js';
 
 import type { ChatInputCommandInteraction } from 'discord.js';
 
@@ -7,26 +13,31 @@ const command: Command<ChatInputCommandInteraction> = {
         .setName('ping')
         .setDescription('Pong! Returns the latency of the bot in ms!'),
     execute: async (interaction) => {
-        const wslatency = Date.now() - interaction.createdTimestamp;
-        const apilatency = Math.round(interaction.client.ws.ping);
+        const message = await interaction.reply({
+            content: italic('Pinging...'),
+            fetchReply: true
+        });
 
         const embed = new EmbedBuilder()
-            .setTitle('Pong! 🏓')
             .addFields([
                 {
-                    name: 'WS Latency',
-                    value: `**${wslatency}**ms`,
-                    inline: true
+                    name: ':sparkling_heart: WS Latency',
+                    value: `${bold(interaction.client.ws.ping.toString())}ms`
                 },
                 {
-                    name: 'API Latency',
-                    value: `**${apilatency}**ms`,
-                    inline: true
+                    name: ':round_pushpin: Rountrip Latency',
+                    value: `${bold((message.createdTimestamp - interaction.createdTimestamp).toString())}ms`
                 }
             ])
-            .setColor(Colors.Green);
+            .setColor(Colors.Green)
+            .setFooter({
+                text: `Requested by ${interaction.user.tag}`,
+                iconURL: interaction.user.displayAvatarURL()
+            })
+            .setTimestamp();
 
-        await interaction.reply({
+        await interaction.editReply({
+            content: italic('Here are the results!'),
             embeds: [embed]
         });
     }
