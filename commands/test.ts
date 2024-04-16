@@ -2,10 +2,9 @@ import {
     SlashCommandBuilder,
     EmbedBuilder,
     Colors,
-    PermissionFlagsBits
+    PermissionFlagsBits,
+    type ChatInputCommandInteraction
 } from 'discord.js';
-
-import type { ChatInputCommandInteraction } from 'discord.js';
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()

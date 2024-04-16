@@ -1,9 +1,9 @@
-import { Collection } from 'discord.js';
-import { ApplicationCommandsAPI } from '@discordjs/core';
-import type {
-    APIApplicationCommand,
+import {
+    Collection,
+    type APIApplicationCommand,
     ChatInputCommandInteraction
 } from 'discord.js';
+import { ApplicationCommandsAPI } from '@discordjs/core';
 
 import CustomClient from '../structures/CustomClient';
 

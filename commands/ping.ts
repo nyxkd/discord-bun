@@ -3,10 +3,9 @@ import {
     EmbedBuilder,
     SlashCommandBuilder,
     bold,
-    italic
+    italic,
+    type ChatInputCommandInteraction
 } from 'discord.js';
-
-import type { ChatInputCommandInteraction } from 'discord.js';
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()
