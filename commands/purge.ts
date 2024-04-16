@@ -3,7 +3,8 @@ import {
     type GuildTextBasedChannel,
     PermissionFlagsBits,
     SlashCommandBuilder,
-    EmbedBuilder
+    EmbedBuilder,
+    Colors
 } from 'discord.js';
 
 const command: Command<ChatInputCommandInteraction> = {
@@ -42,6 +43,7 @@ const command: Command<ChatInputCommandInteraction> = {
 
         const embed = new EmbedBuilder()
             .setTitle(`Purged **${amount}** message${amount === 1 ? '' : 's'}.`)
+            .setColor(Colors.Green);
 
         await interaction.reply({
             embeds: [embed]
