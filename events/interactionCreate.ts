@@ -3,7 +3,7 @@ import { EmbedBuilder, Colors, Events } from 'discord.js';
 
 import type { Event } from '../globals';
 
-const interactionCreateEvent: Event<Events.InteractionCreate> = {
+const event: Event<Events.InteractionCreate> = {
     once: false,
     async execute(client, interaction: BaseInteraction) {
         if (!interaction.isCommand()) return;
@@ -32,4 +32,4 @@ const interactionCreateEvent: Event<Events.InteractionCreate> = {
     }
 };
 
-export default interactionCreateEvent;
+export default event;
