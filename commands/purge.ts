@@ -25,9 +25,7 @@ const command: Command<ChatInputCommandInteraction> = {
         if (!interaction.channel?.isTextBased) {
             const embed = new EmbedBuilder()
                 .setTitle('Error')
-                .setDescription(
-                    'This command can only be used in text channels.'
-                );
+                .setDescription('This command can only be used in text channels.');
 
             await interaction.reply({
                 embeds: [embed],

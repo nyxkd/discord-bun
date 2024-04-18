@@ -1,8 +1,4 @@
-import {
-    Collection,
-    type APIApplicationCommand,
-    ChatInputCommandInteraction
-} from 'discord.js';
+import { Collection, type APIApplicationCommand, ChatInputCommandInteraction } from 'discord.js';
 import { ApplicationCommandsAPI } from '@discordjs/core';
 
 import CustomClient from '../structures/CustomClient';
@@ -53,17 +49,11 @@ class CommandHandler {
 
         const doesHasesExist = await Bun.file('hashes.json').exists();
         if (!doesHasesExist) {
-            this.client.logger.log(
-                'commandHandler',
-                'Hashes file does not exist, creating one...'
-            );
+            this.client.logger.log('commandHandler', 'Hashes file does not exist, creating one...');
             await Bun.write('hashes.json', '{}');
         }
 
-        const localCommands = new Collection<
-            string,
-            Command<ChatInputCommandInteraction>
-        >();
+        const localCommands = new Collection<string, Command<ChatInputCommandInteraction>>();
 
         // Populate localCommands with the local commands
         for (const file of commandFiles) {
@@ -80,16 +70,15 @@ class CommandHandler {
         const guildCommands = new Collection<string, APIApplicationCommand>();
 
         // Populate guildCommands with the guild commands
-        await this.APIClient.getGuildCommands(
-            this.client.config.applicationID,
-            this.client.config.testGuildID
-        ).then(async (commands) => {
-            for (const command of commands) {
-                guildCommands.set(command.name, command);
-            }
+        await this.APIClient.getGuildCommands(this.client.config.applicationID, this.client.config.testGuildID).then(
+            async (commands) => {
+                for (const command of commands) {
+                    guildCommands.set(command.name, command);
+                }
 
-            // this.client.logger.log('commandHandler', `Found ${commands.length} guild commands: ${commands.map(command => command.name).join(', ')}`);
-        });
+                // this.client.logger.log('commandHandler', `Found ${commands.length} guild commands: ${commands.map(command => command.name).join(', ')}`);
+            }
+        );
         // console.table(guildCommands.map(command => command.name));
 
         // Check if there are any commands that are on the guild but not local and delete them
@@ -103,15 +92,9 @@ class CommandHandler {
 
                 // delete the hash from the hashes file
                 const hash = await this.readHash(command.name);
-                this.client.logger.log(
-                    'commandHandler',
-                    `Deleted hash for command ${command.name}: ${hash}`
-                );
+                this.client.logger.log('commandHandler', `Deleted hash for command ${command.name}: ${hash}`);
 
-                this.client.logger.log(
-                    'commandHandler',
-                    `Deleted guild command: ${command.name}`
-                );
+                this.client.logger.log('commandHandler', `Deleted guild command: ${command.name}`);
             }
         });
 
@@ -123,10 +106,7 @@ class CommandHandler {
                     this.client.config.testGuildID,
                     command.data.toJSON()
                 );
-                this.client.logger.log(
-                    'commandHandler',
-                    `Registered guild command: ${command.data.name}`
-                );
+                this.client.logger.log('commandHandler', `Registered guild command: ${command.data.name}`);
             }
         });
 
@@ -135,9 +115,7 @@ class CommandHandler {
         for (const command of this.client.commands.values()) {
             const hashes = await Bun.file('hashes.json').json();
 
-            const hash = await hasher
-                .update(JSON.stringify(command.data.toJSON()))
-                .digest('hex');
+            const hash = await hasher.update(JSON.stringify(command.data.toJSON())).digest('hex');
             const existingHash = hashes[command.data.name];
 
             if (hash !== existingHash) {
@@ -169,17 +147,11 @@ class CommandHandler {
             for (const commandName in hashes) {
                 if (!this.client.commands.has(commandName)) {
                     this.deleteHash(commandName);
-                    this.client.logger.log(
-                        'commandHandler',
-                        `Deleted hash for command ${commandName}`
-                    );
+                    this.client.logger.log('commandHandler', `Deleted hash for command ${commandName}`);
                 }
             }
 
-            this.client.logger.log(
-                'commandHandler',
-                `Hash for command ${command.data.name}: ${hash}`
-            );
+            this.client.logger.log('commandHandler', `Hash for command ${command.data.name}: ${hash}`);
             this.client.commands.set(command.data.name, command);
         }
     }

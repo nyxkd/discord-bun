@@ -20,8 +20,7 @@ class CustomClient extends Client {
     readonly config: Config;
     applicationID: string;
 
-    commands: Collection<string, Command<ChatInputCommandInteraction>> =
-        new Collection();
+    commands: Collection<string, Command<ChatInputCommandInteraction>> = new Collection();
     events: Collection<string, Event<keyof ClientEvents>> = new Collection();
 
     logger = Logger;
@@ -50,10 +49,7 @@ class CustomClient extends Client {
         this.rest = new REST().setToken(this.config.token);
 
         this.rest.on('response', (response) => {
-            this.logger.log(
-                'rest',
-                `REST Client has received a response: ${response.method} ${response.path}`
-            );
+            this.logger.log('rest', `REST Client has received a response: ${response.method} ${response.path}`);
         });
 
         this.rest.on('rateLimited', (rateLimitInfo) => {

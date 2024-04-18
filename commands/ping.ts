@@ -1,16 +1,7 @@
-import {
-    Colors,
-    EmbedBuilder,
-    SlashCommandBuilder,
-    bold,
-    italic,
-    type ChatInputCommandInteraction
-} from 'discord.js';
+import { Colors, EmbedBuilder, SlashCommandBuilder, bold, italic, type ChatInputCommandInteraction } from 'discord.js';
 
 const command: Command<ChatInputCommandInteraction> = {
-    data: new SlashCommandBuilder()
-        .setName('ping')
-        .setDescription('Pong! Returns the latency of the bot in ms!'),
+    data: new SlashCommandBuilder().setName('ping').setDescription('Pong! Returns the latency of the bot in ms!'),
     execute: async (interaction) => {
         const message = await interaction.reply({
             content: italic('Pinging...'),

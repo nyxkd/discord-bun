@@ -15,10 +15,7 @@ const event: Event<Events.InteractionCreate> = {
         try {
             await command.execute(interaction);
         } catch (error: any) {
-            client.logger.log(
-                'error',
-                `An error has occured while executing ${interaction}: ${error}`
-            );
+            client.logger.log('error', `An error has occured while executing ${interaction}: ${error}`);
 
             const embed = new EmbedBuilder()
                 .setTitle('There was an error while executing this command!')

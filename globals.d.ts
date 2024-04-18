@@ -44,9 +44,6 @@ declare global {
 
     interface Event<T extends keyof ClientEvents> {
         once?: boolean;
-        execute: (
-            client: CustomClient,
-            ...args: ClientEvents[T]
-        ) => Promise<void>;
+        execute: (client: CustomClient, ...args: ClientEvents[T]) => Promise<void>;
     }
 }

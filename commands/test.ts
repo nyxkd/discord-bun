@@ -12,9 +12,7 @@ const command: Command<ChatInputCommandInteraction> = {
         .setDescription('Test command')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     execute: async (interaction) => {
-        const embed = new EmbedBuilder()
-            .setTitle('Test')
-            .setColor(Colors.Green);
+        const embed = new EmbedBuilder().setTitle('Test').setColor(Colors.Green);
 
         await interaction.reply({
             embeds: [embed]
