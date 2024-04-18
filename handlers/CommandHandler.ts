@@ -49,7 +49,7 @@ class CommandHandler {
             (file) => file.endsWith('.ts') || file.endsWith('.js')
         );
 
-        const hasher = new Bun.CryptoHasher('md5');
+        const hasher = new Bun.CryptoHasher('sha256');
 
         const doesHasesExist = await Bun.file('hashes.json').exists();
         if (!doesHasesExist) {
