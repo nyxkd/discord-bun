@@ -39,6 +39,7 @@ declare global {
 
     interface Command<T extends BaseInteraction> {
         data: SlashCommandBuilder;
+        isDevOnly?: boolean;
         execute: (interaction: T) => Promise<void>;
     }
 

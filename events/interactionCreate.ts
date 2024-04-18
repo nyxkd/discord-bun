@@ -13,6 +13,19 @@ const event: Event<Events.InteractionCreate> = {
         if (!command) return;
 
         try {
+            if (command.isDevOnly && !client.config.devIDs.includes(interaction.user.id)) {
+                const embed = new EmbedBuilder()
+                    .setTitle('You do not have permission to use this command!')
+                    .setColor(Colors.Red);
+
+                await interaction.reply({
+                    embeds: [embed],
+                    ephemeral: true
+                });
+
+                return;
+            }
+
             await command.execute(interaction);
         } catch (error: any) {
             client.logger.log('error', `An error has occured while executing ${interaction}: ${error}`);

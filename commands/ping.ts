@@ -2,6 +2,7 @@ import { Colors, EmbedBuilder, SlashCommandBuilder, bold, italic, type ChatInput
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder().setName('ping').setDescription('Pong! Returns the latency of the bot in ms!'),
+    isDevOnly: true,
     execute: async (interaction) => {
         const message = await interaction.reply({
             content: italic('Pinging...'),
