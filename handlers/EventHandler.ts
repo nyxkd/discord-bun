@@ -1,8 +1,6 @@
 import { join } from 'node:path';
 import { readdir } from 'node:fs/promises';
 
-import type CustomClient from '../structures/CustomClient';
-
 class EventHandler {
     client: CustomClient;
 
