@@ -3,13 +3,17 @@
     "module": "index.ts",
     "dependencies": {
         "@discordjs/core": "^1.1.1",
+        "@sequelize/core": "^7.0.0-alpha.40",
+        "@sequelize/postgres": "^7.0.0-alpha.40",
         "discord.js": "^14.14.1",
+        "pg": "^8.11.5",
         "winston": "^3.13.0"
     },
     "scripts": {
         "start": "bun run .",
         "dev": "bun run --watch .",
         "format": "prettier --write .",
+        "db": "docker-compose -f Docker-compose.yml up --remove-orphans",
         "build": "bun build . --target=bun --outdir=dist --outfile=index.js",
         "build:prod": "bun build --compile --minify --sourcemap . --outfile ./dist/run"
     },

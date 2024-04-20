@@ -2,9 +2,9 @@ import { join } from 'node:path';
 import { readdir } from 'node:fs/promises';
 
 class EventHandler {
-    client: CustomClient;
+    client;
 
-    constructor(client: CustomClient) {
+    constructor(client) {
         this.client = client;
     }
 

@@ -5,10 +5,10 @@ import { join } from 'node:path';
 import { readdir } from 'node:fs/promises';
 
 class CommandHandler {
-    client: CustomClient;
+    client;
     APIClient: ApplicationCommandsAPI;
 
-    constructor(client: CustomClient) {
+    constructor(client) {
         this.client = client;
     }
 

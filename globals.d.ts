@@ -1,3 +1,6 @@
+import type { Options } from '@sequelize/core';
+import type Sequelize from '@sequelize/core';
+import type { PostgresDialect } from '@sequelize/postgres';
 import type {
     Client,
     ClientApplication,
@@ -5,12 +8,28 @@ import type {
     Guild,
     BaseInteraction,
     SlashCommandBuilder,
-    ClientEvents
+    ClientEvents,
+    SlashCommandSubcommandBuilder,
+    Role
 } from 'discord.js';
+import type { ClientConfig } from 'pg';
 
 export interface Event<T extends keyof ClientEvents> {
     once?: boolean;
     execute: (client: CustomClient, ...args: any[]) => Promise<void>;
+}
+declare module 'discord.js' {
+    interface Client {
+        config: Config;
+        logger: Logger;
+        applicationID: string;
+
+        commands: Collection<string, Command<BaseInteraction>>;
+        events: Collection<string, Event>;
+
+        EventHandler: EventHandler;
+        CommandHandler: CommandHandler;
+    }
 }
 
 declare global {
@@ -19,26 +38,23 @@ declare global {
         applicationID: ClientApplication['id'];
         devIDs: User['id'][];
         testGuildID: Guild['id'];
+        premiumRoleID: Role['id'];
+        database: {
+            name: ClientConfig['database'];
+            user: ClientConfig['user'];
+            password: ClientConfig['password'];
+            host: ClientConfig['host'];
+            port: ClientConfig['port'];
+        };
     }
 
     interface Logger {
         log: (...args: any[]) => void;
     }
 
-    interface CustomClient extends Client {
-        config: Config;
-        logger: Logger;
-        applicationID: string;
-
-        commands: Collection<string, Command<BaseInteraction>>;
-        events: Collection<string, Event<any>>;
-
-        EventHandler: EventHandler;
-        CommandHandler: CommandHandler;
-    }
-
     interface Command<T extends BaseInteraction> {
-        data: SlashCommandBuilder;
+        /* data: SlashCommandBuilder; */
+        data: any;
         isDevOnly?: boolean;
         execute: (interaction: T) => Promise<void>;
     }
