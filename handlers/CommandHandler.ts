@@ -3,6 +3,7 @@ import { ApplicationCommandsAPI } from '@discordjs/core';
 
 import { join } from 'node:path';
 import { readdir } from 'node:fs/promises';
+import { Hash } from '../schemas/Hash';
 
 class CommandHandler {
     client;
@@ -12,146 +13,112 @@ class CommandHandler {
         this.client = client;
     }
 
-    async readHash(command: string) {
-        // const hash = await Bun.file('hashes.json').json()[command] : throw new Error(`Hash for command ${command} does not exist!`) ?
-        const hashes = await Bun.file('hashes.json').json();
-
-        if (!hashes[command]) {
-            throw new Error(`Hash for command ${command} does not exist!`);
-        }
-
-        return hashes[command];
-    }
-
-    async createHash(command: string, hash: string) {
-        const hashes = await Bun.file('hashes.json').json();
-        hashes[command] = hash;
-
-        await Bun.write('hashes.json', JSON.stringify(hashes, null, 4));
-    }
-
-    async deleteHash(command: string) {
-        const hashes = await Bun.file('hashes.json').json();
-        delete hashes[command];
-
-        await Bun.write('hashes.json', JSON.stringify(hashes, null, 4));
-    }
-
     async initialize() {
+        const hasher = new Bun.CryptoHasher('sha256');
+
         const commandsPath = join(process.cwd(), 'commands');
         const commandFiles = (await readdir(commandsPath)).filter(
             (file) => file.endsWith('.ts') || file.endsWith('.js')
         );
 
-        const hasher = new Bun.CryptoHasher('sha256');
-
-        const doesHasesExist = await Bun.file('hashes.json').exists();
-        if (!doesHasesExist) {
-            this.client.logger.log('commandHandler', 'Hashes file does not exist, creating one...');
-            await Bun.write('hashes.json', '{}');
-        }
-
+        // This collection will contain the commands that are in the commands folder
         const localCommands = new Collection<string, Command<ChatInputCommandInteraction>>();
 
-        // Populate localCommands with the local commands
         for (const file of commandFiles) {
             const command = (await import(join(commandsPath, file))).default;
             localCommands.set(command.data.name, command);
         }
-        // console.table(localCommands.map(command => command.data.name));
-
-        // this.client.logger.log('commandHandler', `Found ${commandFiles.length} command files: ${commandFiles.join(', ')}`);
-        // this.client.logger.log('commandHandler', `Loaded ${localCommands.size} commands: ${localCommands.map(command => command.data.name).join(', ')}`);
 
         this.APIClient = new ApplicationCommandsAPI(this.client.rest);
 
-        const guildCommands = new Collection<string, APIApplicationCommand>();
+        // This collection will contain the commands that are registered in the Discord API
+        const testGuildCommands = new Collection<string, APIApplicationCommand>();
 
-        // Populate guildCommands with the guild commands
+        // Get the commands that are registered in the Discord API and store them in the testGuildCommands collection
         await this.APIClient.getGuildCommands(this.client.config.applicationID, this.client.config.testGuildID).then(
-            async (commands) => {
+            (commands) => {
                 for (const command of commands) {
-                    guildCommands.set(command.name, command);
+                    testGuildCommands.set(command.name, command);
                 }
-
-                // this.client.logger.log('commandHandler', `Found ${commands.length} guild commands: ${commands.map(command => command.name).join(', ')}`);
             }
         );
-        // console.table(guildCommands.map(command => command.name));
 
-        // Check if there are any commands that are on the guild but not local and delete them
-        guildCommands.forEach(async (command) => {
-            if (!localCommands.has(command.name)) {
-                this.APIClient.deleteGuildCommand(
+        for (const command of localCommands) {
+            const localCommand = command[1];
+            const testGuildCommand = testGuildCommands.get(localCommand.data.name);
+
+            if (!testGuildCommand) {
+                await this.APIClient.createGuildCommand(
                     this.client.config.applicationID,
                     this.client.config.testGuildID,
-                    command.id
+                    localCommand.data
                 );
 
-                // delete the hash from the hashes file
-                const hash = await this.readHash(command.name);
-                this.client.logger.log('commandHandler', `Deleted hash for command ${command.name}: ${hash}`);
-
-                this.client.logger.log('commandHandler', `Deleted guild command: ${command.name}`);
-            }
-        });
-
-        // Check if there are any commands that are local but not on the guild and create them
-        localCommands.forEach(async (command) => {
-            if (!guildCommands.has(command.data.name)) {
-                this.APIClient.createGuildCommand(
-                    this.client.config.applicationID,
-                    this.client.config.testGuildID,
-                    command.data.toJSON()
-                );
-                this.client.logger.log('commandHandler', `Registered guild command: ${command.data.name}`);
-            }
-        });
-
-        this.client.commands = localCommands;
-
-        for (const command of this.client.commands.values()) {
-            const hashes = await Bun.file('hashes.json').json();
-
-            const hash = await hasher.update(JSON.stringify(command.data.toJSON())).digest('hex');
-            const existingHash = hashes[command.data.name];
-
-            if (hash !== existingHash) {
-                this.client.logger.log(
-                    'commandHandler',
-                    `Hash for command ${command.data.name} does not match, updating...`
-                );
-
-                await this.APIClient.getGuildCommands(
-                    this.client.config.applicationID,
-                    this.client.config.testGuildID
-                ).then(async (commands) => {
-                    for (const guildCommand of commands) {
-                        if (guildCommand.name === command.data.name) {
-                            await this.APIClient.editGuildCommand(
-                                this.client.config.applicationID,
-                                this.client.config.testGuildID,
-                                guildCommand.id,
-                                command.data.toJSON()
-                            );
-                        }
+                this.client.logger.log('commandHandler', `Created guild command: ${localCommand.data.name}`);
+            } else {
+                const hash = await hasher.update(JSON.stringify(localCommand.data)).digest('hex');
+                let storedHash = await Hash.findOne({
+                    where: {
+                        command: localCommand.data.name
                     }
                 });
 
-                this.createHash(command.data.name, hash);
-            }
+                if (!storedHash) {
+                    this.client.logger.log(
+                        'commandHandler',
+                        `Hash for command ${localCommand.data.name} does not exist, creating one...`
+                    );
 
-            // check if hashes contain the hashes for a command which is not in the local commands and delete it
-            for (const commandName in hashes) {
-                if (!this.client.commands.has(commandName)) {
-                    this.deleteHash(commandName);
-                    this.client.logger.log('commandHandler', `Deleted hash for command ${commandName}`);
+                    await Hash.create({ command: localCommand.data.name, hash });
+
+                    this.client.logger.log('commandHandler', `Created hash for command ${localCommand.data.name}`);
+                }
+
+                storedHash = await Hash.findOne({
+                    where: {
+                        command: localCommand.data.name
+                    }
+                });
+
+                if (storedHash.hash !== hash) {
+                    this.client.logger.log(
+                        'commandHandler',
+                        `Hash for command ${localCommand.data.name} does not match, editing command...`
+                    );
+
+                    await this.APIClient.editGuildCommand(
+                        this.client.config.applicationID,
+                        this.client.config.testGuildID,
+                        testGuildCommand.id,
+                        localCommand.data
+                    );
+
+                    this.client.logger.log('commandHandler', `Edited guild command: ${localCommand.data.name}`);
                 }
             }
-
-            this.client.logger.log('commandHandler', `Hash for command ${command.data.name}: ${hash}`);
-            this.client.commands.set(command.data.name, command);
         }
+
+        const hashes = await Hash.findAll();
+
+        for (const hash of hashes) {
+            if (!localCommands.has(hash.command)) {
+                await Hash.destroy({ where: { command: hash.command } });
+
+                this.client.logger.log('commandHandler', `Deleted hash for command ${hash.command}`);
+
+                const testGuildCommand = testGuildCommands.get(hash.command);
+
+                await this.APIClient.deleteGuildCommand(
+                    this.client.config.applicationID,
+                    this.client.config.testGuildID,
+                    testGuildCommand.id
+                );
+
+                this.client.logger.log('commandHandler', `Deleted guild command: ${hash.command}`);
+            }
+        }
+
+        this.client.commands = localCommands;
     }
 }
 
