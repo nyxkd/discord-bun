@@ -11,6 +11,8 @@ import { REST } from '@discordjs/rest';
 
 import type { Event } from '../globals';
 
+import Database from './Database';
+
 import EventHandler from '../handlers/EventHandler';
 import CommandHandler from '../handlers/CommandHandler';
 
@@ -25,6 +27,7 @@ class CustomClient extends Client {
 
     logger = Logger;
 
+    Database: Database;
     EventHandler: EventHandler;
     CommandHandler: CommandHandler;
 
@@ -44,6 +47,8 @@ class CustomClient extends Client {
 
         this.config = config;
         this.applicationID = config.applicationID;
+
+        this.Database = new Database(this);
         this.EventHandler = new EventHandler(this);
         this.CommandHandler = new CommandHandler(this);
         this.rest = new REST().setToken(this.config.token);
@@ -63,6 +68,7 @@ class CustomClient extends Client {
     }
 
     async initialize() {
+        await this.Database.initialize();
         await this.EventHandler.initialize();
         await this.CommandHandler.initialize();
 

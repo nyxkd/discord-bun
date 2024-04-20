@@ -3,13 +3,21 @@
 ## Setup
 1. Clone the repository
 2. Run `bun install --frozen-lockfile` to install the dependencies
-3.  Create a `.env` file in the root directory with the following contents:
+3. Run `bun db` to run the Docker container needed for the local hosted database
+
+4.  Create a `.env` file in the root directory with the following contents:
     ```env
     TOKEN=YOUR_BOT_TOKEN
+    DB_NAME=YOUR_POSTGRES_DB_NAME
+    DB_USER=YOUR_POSTGRES_DB_USER
+    DB_PASS=YOUR_POSTGRES_DB_PASS
+    DB_HOST=YOUR_POSTGRES_DB_HOST
+    DB_PORT=YOUR_POSTGRES_DB_PORT
+
     ```
     > Get your bot token from the [Discord Developer Portal](https://discord.com/developers/applications)
 
-4. Create a `config.json` file in the root directory with the following contents:
+5. Create a `config.json` file in the root directory with the following contents:
     ```json
     {
         "devIDs": [
@@ -18,7 +26,7 @@
         "testGuildID": "YOUR_TEST_GUILD_ID",
     }
     ```
-5. Run `bun dev` to start the bot
+6. Run `bun dev` to start the bot
 
 ## Making changes
 * Create a new branch for your changes (`git checkout -b my-new-feature`)

@@ -1,16 +1,14 @@
 import { Collection, type APIApplicationCommand, ChatInputCommandInteraction } from 'discord.js';
 import { ApplicationCommandsAPI } from '@discordjs/core';
 
-import CustomClient from '../structures/CustomClient';
-
 import { join } from 'node:path';
 import { readdir } from 'node:fs/promises';
 
 class CommandHandler {
-    client: CustomClient;
+    client;
     APIClient: ApplicationCommandsAPI;
 
-    constructor(client: CustomClient) {
+    constructor(client) {
         this.client = client;
     }
 
