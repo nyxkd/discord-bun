@@ -49,7 +49,7 @@ class CommandHandler {
 
         // This collection will contain the commands that are registered in the Discord API
         const testGuildCommands = new Collection<string, APIApplicationCommand>();
-
+        
         // Get the commands that are registered in the Discord API and store them in the testGuildCommands collection
         await this.APIClient.getGuildCommands(this.client.config.applicationID, this.client.config.testGuildID).then(
             (commands) => {
@@ -64,10 +64,12 @@ class CommandHandler {
             const testGuildCommand = testGuildCommands.get(localCommand.data.name);
 
             if (!testGuildCommand) {
+                this.client.logger.log('commandHandler', `Command ${localCommand.data.name} does not exist, creating...`);
+
                 await this.APIClient.createGuildCommand(
                     this.client.config.applicationID,
                     this.client.config.testGuildID,
-                    localCommand.data
+                    JSON.parse(JSON.stringify(localCommand.data))
                 );
 
                 this.client.logger.log('commandHandler', `Created guild command: ${localCommand.data.name}`);
@@ -106,7 +108,7 @@ class CommandHandler {
                         this.client.config.applicationID,
                         this.client.config.testGuildID,
                         testGuildCommand.id,
-                        localCommand.data
+                        JSON.parse(JSON.stringify(localCommand.data))
                     );
 
                     this.client.logger.log('commandHandler', `Edited guild command: ${localCommand.data.name}`);

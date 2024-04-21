@@ -50,8 +50,7 @@ declare global {
     }
 
     interface Command<T extends BaseInteraction> {
-        /* data: SlashCommandBuilder; */
-        data: any;
+        data: SlashCommandBuilder | SlashCommandSubcommandBuilder;
         isDevOnly?: boolean;
         execute: (interaction: T) => Promise<void>;
     }
