@@ -71,8 +71,20 @@ class CommandHandler {
                     this.client.config.testGuildID,
                     JSON.parse(JSON.stringify(localCommand.data))
                 );
-
                 this.client.logger.log('commandHandler', `Created guild command: ${localCommand.data.name}`);
+
+                const doesHashExist = await Hash.findOne({
+                    where: {
+                        command: localCommand.data.name
+                    }
+                });
+
+                if (!doesHashExist) {
+                    await Hash.create({ command: localCommand.data.name, hash: hasher.update(JSON.stringify(localCommand.data)).digest('hex') });
+                }
+
+                this.client.logger.log('commandHandler', `Created hash for command ${localCommand.data.name}`);
+
             } else {
                 const hash = await hasher.update(JSON.stringify(localCommand.data)).digest('hex');
                 let storedHash = await Hash.findOne({
