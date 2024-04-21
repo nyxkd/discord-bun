@@ -1,6 +1,3 @@
-import type { Options } from '@sequelize/core';
-import type Sequelize from '@sequelize/core';
-import type { PostgresDialect } from '@sequelize/postgres';
 import type {
     Client,
     ClientApplication,
