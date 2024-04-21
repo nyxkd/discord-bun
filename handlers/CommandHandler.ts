@@ -3,6 +3,8 @@ import { ApplicationCommandsAPI } from '@discordjs/core';
 
 import { join } from 'node:path';
 import { readdir } from 'node:fs/promises';
+import { stat } from 'node:fs/promises';
+
 import { Hash } from '../schemas/Hash';
 
 class CommandHandler {
@@ -16,19 +18,33 @@ class CommandHandler {
     async initialize() {
         const hasher = new Bun.CryptoHasher('sha256');
 
-        const commandsPath = join(process.cwd(), 'commands');
-        const commandFiles = (await readdir(commandsPath)).filter(
-            (file) => file.endsWith('.ts') || file.endsWith('.js')
-        );
-
-        // This collection will contain the commands that are in the commands folder
         const localCommands = new Collection<string, Command<ChatInputCommandInteraction>>();
 
-        for (const file of commandFiles) {
-            const command = (await import(join(commandsPath, file))).default;
-            localCommands.set(command.data.name, command);
+        const commandsPath = join(process.cwd(), 'commands');
+        const commandsFolders = await readdir(commandsPath);
+
+        // read the commands folder recursively and get all the commands
+        for (const folder of commandsFolders) {
+            const folderPath = join(commandsPath, folder);
+            const folderStat = await stat(folderPath);
+
+            if (folderStat.isDirectory()) {
+                const folderName = folder.charAt(0) + folder.slice(1);
+                const commandFiles = (await readdir(folderPath)).filter(
+                    (file) => file.endsWith('.ts') || file.endsWith('.js')
+                );
+
+                for (const file of commandFiles) {
+                    const command = (await import(join(folderPath, file))).default;
+
+                    this.client.logger.log('commandHandler', `Loaded command: ${folderName}/${command.data.name}`);
+
+                    localCommands.set(command.data.name, command);
+                }
+            }
         }
 
+        // This collection will contain the commands that are in the commands folder
         this.APIClient = new ApplicationCommandsAPI(this.client.rest);
 
         // This collection will contain the commands that are registered in the Discord API

@@ -1,5 +1,5 @@
 import { Colors, EmbedBuilder, SlashCommandBuilder, italic, type ChatInputCommandInteraction } from 'discord.js';
-import { Premium } from '../schemas/Premium';
+import { Premium } from '../../schemas/Premium';
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()
