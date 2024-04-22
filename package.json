@@ -1,6 +1,9 @@
 {
+    "private": true,
     "name": "discord-bun",
-    "module": "src/index.ts",
+    "description": "A Discord bot using the Bun framework",
+    "license": "MIT",
+    "main": "src/index.ts",
     "dependencies": {
         "@discordjs/core": "^1.1.1",
         "@sequelize/core": "^7.0.0-alpha.40",
