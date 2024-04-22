@@ -4,7 +4,7 @@ import { readdir } from 'node:fs/promises';
 class EventHandler {
     client;
 
-    constructor(client) {
+    constructor(client: CustomClient) {
         this.client = client;
     }
 

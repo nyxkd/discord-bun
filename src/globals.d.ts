@@ -24,8 +24,10 @@ declare module 'discord.js' {
         commands: Collection<string, Command<BaseInteraction>>;
         events: Collection<string, Event>;
 
+        Database: Database;
         EventHandler: EventHandler;
         CommandHandler: CommandHandler;
+        this: CustomClient;
     }
 }
 
@@ -45,6 +47,24 @@ declare global {
         };
     }
 
+    interface CustomClient extends Client {
+        config: Config;
+        logger: Logger;
+        applicationID: string;
+
+        commands: Collection<string, Command<BaseInteraction>>;
+        events: Collection<string, Event>;
+
+        Database: Database;
+        EventHandler: EventHandler;
+        CommandHandler: CommandHandler;
+    }
+
+    interface Database {
+        db: Sequelize;
+        client: CustomClient;
+        initialize: () => Promise<void>;
+    }
     interface Logger {
         log: (...args: any[]) => void;
     }

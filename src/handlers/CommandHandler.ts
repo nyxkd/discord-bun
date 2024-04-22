@@ -11,7 +11,7 @@ class CommandHandler {
     client;
     APIClient: ApplicationCommandsAPI;
 
-    constructor(client) {
+    constructor(client: CustomClient) {
         this.client = client;
     }
 

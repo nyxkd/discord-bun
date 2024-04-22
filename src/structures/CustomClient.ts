@@ -27,7 +27,6 @@ class CustomClient extends Client {
 
     logger = Logger;
 
-    Database: Database;
     EventHandler: EventHandler;
     CommandHandler: CommandHandler;
 

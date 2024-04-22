@@ -7,8 +7,9 @@ class Database {
     public db: Sequelize;
     public client;
 
-    constructor(client) {
+    constructor(client: CustomClient) {
         this.client = client;
+
     }
 
     public async initialize() {
