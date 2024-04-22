@@ -1,10 +1,9 @@
 # Contributing to the project
 
 ## Setup
-1. Clone the repository
+1. Fork & clone the repository
 2. Run `bun install --frozen-lockfile` to install the dependencies
 3. Run `bun db` to run the Docker container needed for the local hosted database
-
 4.  Create a `.env` file in the root directory with the following contents:
     ```env
     TOKEN=YOUR_BOT_TOKEN
@@ -16,7 +15,6 @@
 
     ```
     > Get your bot token from the [Discord Developer Portal](https://discord.com/developers/applications)
-
 5. Create a `config.json` file in the root directory with the following contents:
     ```json
     {
