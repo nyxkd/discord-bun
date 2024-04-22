@@ -1,6 +1,6 @@
 import { Events } from 'discord.js';
 
-import type { Event } from '../globals';
+import type { Event } from '../../globals';
 
 const event: Event<Events.ClientReady> = {
     once: true,

@@ -1,5 +1,5 @@
 import CustomClient from './structures/CustomClient';
-import config from './config.json';
+import config from '../config.json';
 
 new CustomClient({
     token: Bun.env['TOKEN'] as string,

@@ -1,6 +1,6 @@
 {
     "name": "discord-bun",
-    "module": "index.ts",
+    "module": "src/index.ts",
     "dependencies": {
         "@discordjs/core": "^1.1.1",
         "@sequelize/core": "^7.0.0-alpha.40",

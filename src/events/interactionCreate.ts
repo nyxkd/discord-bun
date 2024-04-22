@@ -1,7 +1,7 @@
 import { BaseInteraction } from 'discord.js';
 import { EmbedBuilder, Colors, Events } from 'discord.js';
 
-import type { Event } from '../globals';
+import type { Event } from '../../globals';
 
 const event: Event<Events.InteractionCreate> = {
     once: false,

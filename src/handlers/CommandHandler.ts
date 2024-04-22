@@ -20,7 +20,7 @@ class CommandHandler {
 
         const localCommands = new Collection<string, Command<ChatInputCommandInteraction>>();
 
-        const commandsPath = join(process.cwd(), 'commands');
+        const commandsPath = join(process.cwd(), 'src', 'commands');
         const commandsFolders = await readdir(commandsPath);
 
         // read the commands folder recursively and get all the commands
