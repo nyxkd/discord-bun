@@ -1,6 +1,3 @@
-import type { Options } from '@sequelize/core';
-import type Sequelize from '@sequelize/core';
-import type { PostgresDialect } from '@sequelize/postgres';
 import type {
     Client,
     ClientApplication,
@@ -53,8 +50,7 @@ declare global {
     }
 
     interface Command<T extends BaseInteraction> {
-        /* data: SlashCommandBuilder; */
-        data: any;
+        data: SlashCommandBuilder | SlashCommandSubcommandBuilder;
         isDevOnly?: boolean;
         execute: (interaction: T) => Promise<void>;
     }

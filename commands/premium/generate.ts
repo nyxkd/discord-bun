@@ -6,7 +6,7 @@ import {
     codeBlock,
     type ChatInputCommandInteraction
 } from 'discord.js';
-import { Premium } from '../schemas/Premium';
+import { Premium } from '../../schemas/Premium';
 
 const generateCode = async () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();

@@ -13,9 +13,7 @@
         "start": "bun run .",
         "dev": "bun run --watch .",
         "format": "prettier --write .",
-        "db": "docker-compose -f Docker-compose.yml up --remove-orphans",
-        "build": "bun build . --target=bun --outdir=dist --outfile=index.js",
-        "build:prod": "bun build --compile --minify --sourcemap . --outfile ./dist/run"
+        "db": "docker-compose -f Docker-compose.yml up --remove-orphans"
     },
     "type": "module",
     "devDependencies": {

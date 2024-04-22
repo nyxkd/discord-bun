@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { Premium } from '../schemas/Premium';
+import { Premium } from '../../schemas/Premium';
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder().setName('clearcodes').setDescription('Purges messages from the channel.'),

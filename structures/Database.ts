@@ -1,6 +1,7 @@
 import { Sequelize } from '@sequelize/core';
 import { PostgresDialect } from '@sequelize/postgres';
 import { Premium } from '../schemas/Premium';
+import { Hash } from '../schemas/Hash';
 
 class Database {
     public db: Sequelize;
@@ -18,7 +19,7 @@ class Database {
             password: this.client.config.database.password,
             host: this.client.config.database.host,
             port: this.client.config.database.port,
-            models: [Premium],
+            models: [Premium, Hash],
             define: {
                 freezeTableName: true
             }
