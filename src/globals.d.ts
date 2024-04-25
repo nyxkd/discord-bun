@@ -7,9 +7,11 @@ import type {
     SlashCommandBuilder,
     ClientEvents,
     SlashCommandSubcommandBuilder,
-    Role
+    Role,
+    AutocompleteInteraction
 } from 'discord.js';
 import type { ClientConfig } from 'pg';
+import type { REST } from '@discordjs/rest';
 
 export interface Event<T extends keyof ClientEvents> {
     once?: boolean;
@@ -21,13 +23,16 @@ declare module 'discord.js' {
         logger: Logger;
         applicationID: string;
 
+        testGuildCommands: Collection<string, Command<BaseInteraction>>;
         commands: Collection<string, Command<BaseInteraction>>;
         events: Collection<string, Event>;
 
         Database: Database;
         EventHandler: EventHandler;
         CommandHandler: CommandHandler;
-        this: CustomClient;
+
+        rest: REST;
+        APIClient: ApplicationCommandsAPI;
     }
 }
 
@@ -50,7 +55,7 @@ declare global {
     interface CustomClient extends Client {
         config: Config;
         logger: Logger;
-        applicationID: string;
+        applicationID: Client.application.id;
 
         commands: Collection<string, Command<BaseInteraction>>;
         events: Collection<string, Event>;
@@ -58,10 +63,13 @@ declare global {
         Database: Database;
         EventHandler: EventHandler;
         CommandHandler: CommandHandler;
+
+        rest: REST;
+        APIClient: ApplicationCommandsAPI;
     }
 
     interface Database {
-        db: Sequelize;
+        database: Sequelize;
         client: CustomClient;
         initialize: () => Promise<void>;
     }
@@ -69,10 +77,11 @@ declare global {
         log: (...args: any[]) => void;
     }
 
-    interface Command<T extends BaseInteraction> {
+    interface Command<T extends CommandInteraction> {
         data: Omit<SlashCommandBuilder, 'addSubcommandGroup' | 'addSubcommand'> | SlashCommandSubcommandsOnlyBuilder;
         isDevOnly?: boolean;
         execute: (interaction: T) => Promise<void>;
+        autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
     }
 
     interface Event<T extends keyof ClientEvents> {
