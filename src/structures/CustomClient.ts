@@ -7,6 +7,8 @@ import {
     type ClientEvents
 } from 'discord.js';
 
+import { ApplicationCommandsAPI } from '@discordjs/core';
+
 import { REST } from '@discordjs/rest';
 
 import type { Event } from '../globals';
@@ -22,6 +24,7 @@ class CustomClient extends Client {
     readonly config: Config;
     applicationID: string;
 
+    testGuildCommands: Collection<string, Command<ChatInputCommandInteraction>> = new Collection();
     commands: Collection<string, Command<ChatInputCommandInteraction>> = new Collection();
     events: Collection<string, Event<keyof ClientEvents>> = new Collection();
 
@@ -29,6 +32,9 @@ class CustomClient extends Client {
 
     EventHandler: EventHandler;
     CommandHandler: CommandHandler;
+    Database: Database;
+
+    APIClient: ApplicationCommandsAPI;
 
     constructor(config: Config) {
         super({
@@ -37,8 +43,8 @@ class CustomClient extends Client {
                 status: 'online',
                 activities: [
                     {
-                        type: ActivityType.Playing,
-                        name: 'with discord.js'
+                        type: ActivityType.Watching,
+                        name: 'the birds. 🦜'
                     }
                 ]
             }
@@ -50,10 +56,12 @@ class CustomClient extends Client {
         this.Database = new Database(this);
         this.EventHandler = new EventHandler(this);
         this.CommandHandler = new CommandHandler(this);
-        this.rest = new REST().setToken(this.config.token);
 
-        this.rest.on('response', (response) => {
-            this.logger.log('rest', `REST Client has received a response: ${response.method} ${response.path}`);
+        this.rest = new REST().setToken(this.config.token);
+        this.APIClient = new ApplicationCommandsAPI(this.rest);
+
+        this.rest.on('response', async (response) => {
+            this.logger.log('rest', `REST Client has received a response: ${response.method} ${response.path}.`);
         });
 
         this.rest.on('rateLimited', (rateLimitInfo) => {
@@ -70,14 +78,6 @@ class CustomClient extends Client {
         await this.Database.initialize();
         await this.EventHandler.initialize();
         await this.CommandHandler.initialize();
-
-        process.on('unhandledRejection', (error) => {
-            this.logger.log('error', `Unhandled promise rejection: ${error}`);
-        });
-
-        process.on('uncaughtException', (error) => {
-            this.logger.log('error', `Uncaught exception: ${error}`);
-        });
 
         await this.login(this.config.token);
     }

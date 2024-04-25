@@ -10,4 +10,12 @@ export class Hash extends Model<InferAttributes<Hash>, InferCreationAttributes<H
     @Attribute(DataTypes.STRING)
     @NotNull
     declare hash: string;
+
+    @Attribute(DataTypes.DATE)
+    @NotNull
+    declare createdAt: Date;
+
+    @Attribute(DataTypes.DATE)
+    @NotNull
+    declare updatedAt: Date;
 }

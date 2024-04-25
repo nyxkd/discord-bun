@@ -4,16 +4,15 @@ import { Premium } from '../schemas/Premium';
 import { Hash } from '../schemas/Hash';
 
 class Database {
-    public db: Sequelize;
-    public client;
+    public database: Sequelize;
+    public client: CustomClient;
 
     constructor(client: CustomClient) {
         this.client = client;
-
     }
 
     public async initialize() {
-        this.db = new Sequelize({
+        this.database = new Sequelize({
             dialect: PostgresDialect,
             database: this.client.config.database.name,
             user: this.client.config.database.user,
@@ -26,14 +25,14 @@ class Database {
             }
         });
 
-        await this.db
+        await this.database
             .authenticate()
             .then(async () => {
-                await this.db.sync();
+                await this.database.sync();
 
                 this.client.logger.log('event', 'Connected to the database.');
             })
-            .catch((error) => {
+            .catch((error: Error) => {
                 this.client.logger.log('error', `Failed to connect to the database: ${error}`);
                 process.exit(1);
             });

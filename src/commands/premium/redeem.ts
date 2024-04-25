@@ -59,13 +59,6 @@ const command: Command<ChatInputCommandInteraction> = {
                     `Failed to add the premium role to ${interaction.user.tag}: ${error}`
                 );
 
-                if (error.message === 'Missing Permissions') {
-                    return interaction.reply({
-                        content: 'I do not have the required permissions to add the premium role to you!',
-                        ephemeral: true
-                    });
-                }
-
                 return interaction.reply({
                     content: 'An error has occurred while trying to redeem the code!',
                     ephemeral: true
