@@ -6,8 +6,10 @@
     "main": "src/index.ts",
     "dependencies": {
         "@discordjs/core": "^1.1.1",
+        "@discordjs/rest": "^2.2.0",
         "@sequelize/core": "^7.0.0-alpha.40",
         "@sequelize/postgres": "^7.0.0-alpha.40",
+        "discord-api-types": "^0.37.81",
         "discord.js": "^14.14.1",
         "pg": "^8.11.5",
         "winston": "^3.13.0"
@@ -16,11 +18,13 @@
         "start": "bun run .",
         "dev": "bun run --watch .",
         "format": "prettier --write .",
-        "db": "docker-compose -f Docker-compose.yml up --remove-orphans"
+        "db": "docker-compose -f Docker-compose.yml up --remove-orphans",
+        "prepare": "husky"
     },
     "type": "module",
     "devDependencies": {
         "@types/bun": "^1.0.12",
+        "husky": "^9.0.11",
         "prettier": "^3.2.5",
         "typescript": "^5.4.4"
     }
