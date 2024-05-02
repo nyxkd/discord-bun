@@ -3,7 +3,7 @@
 ## Setup
 1. Fork & clone the repository
 2. Run `bun install --frozen-lockfile` to install the dependencies
-3. Run `bun db` to run the Docker container needed for the local hosted database
+3. Run `bun db:up` to run the Docker container needed for the local hosted database
 4.  Create a `.env` file in the root directory with the following contents:
     ```env
     TOKEN=YOUR_BOT_TOKEN
