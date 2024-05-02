@@ -3,29 +3,28 @@ import type {
     ClientApplication,
     User,
     Guild,
-    BaseInteraction,
+    CommandInteraction,
     SlashCommandBuilder,
     ClientEvents,
     SlashCommandSubcommandBuilder,
     Role,
-    AutocompleteInteraction
+    AutocompleteInteraction,
+    SlashCommandSubcommandsOnlyBuilder,
+    Collection
 } from 'discord.js';
 import type { ClientConfig } from 'pg';
 import type { REST } from '@discordjs/rest';
+import type { ApplicationCommandsAPI } from '@discordjs/core';
 
-export interface Event<T extends keyof ClientEvents> {
-    once?: boolean;
-    execute: (client: CustomClient, ...args: any[]) => Promise<void>;
-}
 declare module 'discord.js' {
     interface Client {
         config: Config;
         logger: Logger;
         applicationID: string;
 
-        testGuildCommands: Collection<string, Command<BaseInteraction>>;
-        commands: Collection<string, Command<BaseInteraction>>;
-        events: Collection<string, Event>;
+        testGuildCommands: Collection<string, Command<T>>;
+        commands: Collection<string, Command<T>>;
+        events: Collection<string, ClientEvent>;
 
         Database: Database;
         EventHandler: EventHandler;
@@ -57,8 +56,9 @@ declare global {
         logger: Logger;
         applicationID: Client.application.id;
 
-        commands: Collection<string, Command<BaseInteraction>>;
-        events: Collection<string, Event>;
+        testGuildCommands: Collection<string, Command<T>>;
+        commands: Collection<string, Command<T>>;
+        events: Collection<string, ClientEvent>;
 
         Database: Database;
         EventHandler: EventHandler;
@@ -84,7 +84,7 @@ declare global {
         autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
     }
 
-    interface Event<T extends keyof ClientEvents> {
+    interface ClientEvent<T extends keyof ClientEvents> {
         once?: boolean;
         execute: (client: CustomClient, ...args: ClientEvents[T]) => Promise<void>;
     }

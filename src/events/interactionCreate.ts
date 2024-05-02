@@ -1,9 +1,7 @@
-import { AutocompleteInteraction, type BaseInteraction, CommandInteraction } from 'discord.js';
+import { type BaseInteraction, CommandInteraction } from 'discord.js';
 import { EmbedBuilder, Colors, Events } from 'discord.js';
 
-import { type Event } from '../globals.d';
-
-const event: Event<Events.InteractionCreate> = {
+const event: ClientEvent<Events.InteractionCreate> = {
     once: false,
     async execute(client, interaction: BaseInteraction) {
         if (!interaction.isCommand() && !interaction.isAutocomplete()) return;
@@ -43,7 +41,7 @@ const event: Event<Events.InteractionCreate> = {
             }
         } else if (interaction.isAutocomplete()) {
             const command = (client.testGuildCommands.get(interaction.commandName) ||
-                client.commands.get(interaction.commandName)) as Command<AutocompleteInteraction>;
+                client.commands.get(interaction.commandName)) as Command<CommandInteraction>;
             if (!command) return;
 
             if (command.autocomplete) {
