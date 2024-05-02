@@ -5,20 +5,40 @@ const command: Command<ChatInputCommandInteraction> = {
         .setName('remove')
         .setDescription('Remove a global command')
         .addStringOption((option) =>
-            option.setName('command').setDescription('The command to remove').setRequired(true)
+            option
+                .setName('name')
+                .setDescription('The name of the command you want to remove')
+                .setAutocomplete(true)
+                .setRequired(true)
         ),
     isDevOnly: true,
-    execute: async (interaction) => {
-        const command = interaction.options.getString('command', true);
+    autocomplete: async (interaction) => {
+        const command = interaction.options.getString('name');
 
-        const currentComands = await interaction.client.application?.commands.fetch();
+        const commands = await interaction.client.APIClient.getGlobalCommands(interaction.client.config.applicationID);
+
+        const filtered = commands.filter((c) => c.name.startsWith(command));
+
+        const choices = filtered.map((c) => {
+            return {
+                name: c.name,
+                value: c.name
+            };
+        });
+
+        await interaction.respond(choices);
+    },
+    execute: async (interaction) => {
+        const command = interaction.options.getString('command');
+
+        const currentComands = await interaction.client.APIClient.getGlobalCommands(
+            interaction.client.config.applicationID
+        );
+
         const commandToRemove = currentComands.find((c) => c.name === command);
 
         if (!commandToRemove) {
-            const embed = new EmbedBuilder()
-                .setTitle('Error')
-                .setDescription(`Command ${command} not found`)
-                .setColor(Colors.Red);
+            const embed = new EmbedBuilder().setTitle(`Command ${command} not found`).setColor(Colors.Red);
 
             await interaction.reply({
                 embeds: [embed]
@@ -26,27 +46,15 @@ const command: Command<ChatInputCommandInteraction> = {
             return;
         }
 
-        try {
-            await interaction.client.application?.commands.delete(commandToRemove.id);
-
+        await interaction.client.application.commands.delete(commandToRemove.id).then(async () => {
             const embed = new EmbedBuilder()
-                .setTitle('Removed command')
-                .setDescription(`Successfully removed the command ${command}`)
+                .setTitle(`Successfully removed the command ${command}`)
                 .setColor(Colors.Green);
 
             await interaction.reply({
                 embeds: [embed]
             });
-        } catch (error) {
-            const embed = new EmbedBuilder()
-                .setTitle('Error')
-                .setDescription(`Failed to remove the command ${command}`)
-                .setColor(Colors.Red);
-
-            await interaction.reply({
-                embeds: [embed]
-            });
-        }
+        });
     }
 };
 

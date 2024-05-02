@@ -8,32 +8,32 @@ const command: Command<ChatInputCommandInteraction> = {
         .setDescription('Interrogate the database to read the hash of a command')
         .addStringOption((option) =>
             option
-                .setName('command')
-                .setDescription('The command to read the hash of')
+                .setName('name')
+                .setDescription('The name of the command to read the hash of')
                 .setAutocomplete(true)
                 .setRequired(true)
         ),
     isDevOnly: true,
     autocomplete: async (interaction) => {
-        const commands = await Hash.findAll({
+        const command = interaction.options.getString('command');
+
+        const hashes = await Hash.findAll({
             attributes: ['command']
         });
 
-        const command = interaction.options.getString('command', true);
+        const filtered = hashes.filter((c) => c.command.startsWith(command));
 
-        const filteredCommands = commands.filter((cmd) => cmd.command.startsWith(command));
-
-        const choices = filteredCommands.map((cmd) => {
+        const choices = filtered.map((c) => {
             return {
-                name: cmd.command,
-                value: cmd.command
+                name: c.command,
+                value: c.command
             };
         });
 
         await interaction.respond(choices);
     },
     execute: async (interaction) => {
-        const command = interaction.options.getString('command', true);
+        const command = interaction.options.getString('name');
 
         const hash = await Hash.findOne({
             where: {

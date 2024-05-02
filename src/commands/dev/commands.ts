@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, type ChatInputCommandInteraction, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, type ChatInputCommandInteraction } from 'discord.js';
 
 const command: Command<ChatInputCommandInteraction> = {
     data: new SlashCommandBuilder()
@@ -6,22 +6,10 @@ const command: Command<ChatInputCommandInteraction> = {
         .setDescription('Do something with commands!')
         .addSubcommand((subcommand) =>
             subcommand
-                .setName('deploy')
-                .setDescription('Deploy a global command')
-                .addStringOption((option) =>
-                    option
-                        .setName('name')
-                        .setDescription('The name of the command')
-                        .setAutocomplete(true)
-                        .setRequired(true)
-                )
-        )
-        .addSubcommand((subcommand) =>
-            subcommand
                 .setName('list')
                 .setDescription('List all commands')
                 .addStringOption((option) =>
-                    option.setName('kind').setDescription('The kind of commands to list').addChoices(
+                    option.setName('kind').setDescription('The kind of commands to list').setRequired(true).addChoices(
                         {
                             name: 'global',
                             value: 'global'
@@ -35,20 +23,16 @@ const command: Command<ChatInputCommandInteraction> = {
         ),
     isDevOnly: true,
     autocomplete: async (interaction) => {
-        const commands = interaction.client.testGuildCommands.map((command: Command<CommandInteraction>) => {
+        const command = interaction.options.getString('name');
+
+        const commands = interaction.client.testGuildCommands;
+
+        const filtered = commands.filter((c) => c.data.name.startsWith(command));
+
+        const choices = filtered.map((c) => {
             return {
-                command: command.data.name
-            };
-        });
-
-        const command = interaction.options.getString('name', true);
-
-        const filteredCommands = commands.filter((cmd) => cmd.command.startsWith(command));
-
-        const choices = filteredCommands.map((cmd) => {
-            return {
-                name: cmd.command,
-                value: cmd.command
+                name: c.data.name,
+                value: c.data.name
             };
         });
 
@@ -58,7 +42,7 @@ const command: Command<ChatInputCommandInteraction> = {
         const subcommand = interaction.options.getSubcommand(true);
 
         if (subcommand === 'list') {
-            const kind = interaction.options.getString('kind', false);
+            const kind = interaction.options.getString('kind');
 
             if (kind === 'global') {
                 const currentCommands = await interaction.client.application?.commands.fetch();
@@ -93,31 +77,6 @@ const command: Command<ChatInputCommandInteraction> = {
                     embeds: [embed]
                 });
             }
-        }
-
-        if (subcommand === 'deploy') {
-            const name = interaction.options.getString('name', true);
-
-            const commandToDeploy = interaction.client.testGuildCommands.get(name) as Command<CommandInteraction>;
-
-            if (!command) {
-                await interaction.reply({
-                    content: 'Command not found!',
-                    ephemeral: true
-                });
-
-                return;
-            }
-
-            await interaction.client.APIClient.createGlobalCommand(
-                interaction.client.config.applicationID,
-                commandToDeploy.data.toJSON()
-            );
-
-            await interaction.reply({
-                content: 'Command deployed!',
-                ephemeral: true
-            });
         }
     }
 };
