@@ -23,6 +23,7 @@
         ],
         "testGuildID": "YOUR_TEST_GUILD_ID",
         "premiumRoleID": "YOUR_PREMIUM_ROLE_ID",
+        "applicationID": "YOUR_APPLICATION_ID"
     }
     ```
 6. Run `bun dev` to start the bot
